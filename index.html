@@ -83,16 +83,6 @@
             background: rgba(255,255,255,0.02);
         }
 
-        .menu-header:active { background: rgba(255,255,255,0.05); }
-
-        .menu-header i {
-            width: 10px; height: 10px;
-            border-right: 2px solid var(--primary);
-            border-bottom: 2px solid var(--primary);
-            transform: rotate(45deg);
-            transition: 0.3s;
-        }
-
         .menu-content {
             display: none;
             padding: 15px;
@@ -104,7 +94,6 @@
         .menu-section.active .menu-content { display: grid; }
         .menu-section.active .menu-header i { transform: rotate(-135deg); }
 
-        /* كروت النتائج */
         .result-item {
             background: rgba(255,255,255,0.03);
             padding: 18px; border-radius: 12px;
@@ -112,20 +101,23 @@
             font-size: 1.2rem; border: 1px solid transparent;
         }
 
-        .result-item:active { background: var(--primary); color: #000; transform: scale(0.98); }
-
-        /* قسم الرموز النادرة جداً */
-        .rare-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+        /* عداد الزوار */
+        .visitor-counter {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            color: var(--primary);
         }
 
-        .sym-btn {
-            background: #1c222d; height: 60px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; font-size: 1.5rem; cursor: pointer;
-        }
+        .counter-num { font-weight: 900; color: #fff; letter-spacing: 1px; }
 
-        /* الفوتر الاحترافي */
         footer {
             margin-top: 50px; padding: 40px 20px;
             text-align: center; border-top: 1px solid #232936;
@@ -133,12 +125,11 @@
 
         .dev-tag { color: var(--primary); font-weight: bold; font-size: 1.1rem; margin-top: 10px; }
 
-        /* إشعار النسخ */
         #toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: var(--primary); color: #000; padding: 12px 30px;
             border-radius: 50px; font-weight: bold; z-index: 1000;
-            display: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: none;
         }
     </style>
 </head>
@@ -152,7 +143,13 @@
     <p style="opacity: 0.5; font-size: 0.8rem; margin-top: 5px;">نظام الزخرفة العالمي المعتمد</p>
 </div>
 
-<div class="container">
+<div class="container" style="text-align: center;">
+    
+    <div class="visitor-counter">
+        <span>VISITORS:</span>
+        <span id="count" class="counter-num">...</span>
+    </div>
+
     <input type="text" id="userInput" class="input-box" placeholder="اكتب الاسم هنا..." oninput="updateAll()">
 
     <div class="menu-section" onclick="toggleMenu(this)">
@@ -169,54 +166,36 @@
         <div class="menu-header">زخارف نادرة (2026) <i></i></div>
         <div class="menu-content" id="rareList"></div>
     </div>
-
-    <div class="menu-section" onclick="toggleMenu(this)">
-        <div class="menu-header">لوحة الرموز العالمية <i></i></div>
-        <div class="menu-content">
-            <div id="symbolsBox" class="rare-grid"></div>
-        </div>
-    </div>
 </div>
 
 <footer>
-    <div style="opacity: 0.6;">النسخة الرسمية V4.0</div>
     <div class="dev-tag">تم الإنشاء من قبل: نادر فهد العتيبي</div>
-    <div style="font-size: 0.7rem; margin-top: 15px; opacity: 0.4;">حقوق الطبع والنشر © 2025 - 2026 محفوظة</div>
+    <div style="font-size: 0.7rem; margin-top: 15px; opacity: 0.4;">حقوق الطبع والنشر © 2026 محفوظة</div>
 </footer>
 
 <script>
-    const symbols = ['𓆩','𓆪','𓅓','𓆩','𓆪','♰','☬','卍','〆','々','๛','⚚','🔱','💎','👑','⚡','⚔️','🛡️','💀','☠️','☣️','☢️','🧿','🔮','🔥','💨','✨','🌌','🌑','🪐','🦅','🐉','🦁','🎭','🎰','ﷲ','﷽','ﷻ','۞','☪'];
-
-    // تهيئة الرموز
-    const sBox = document.getElementById('symbolsBox');
-    symbols.forEach(s => {
-        const d = document.createElement('div');
-        d.className = 'sym-btn';
-        d.innerText = s;
-        d.onclick = (e) => { e.stopPropagation(); copy(s); };
-        sBox.appendChild(d);
-    });
-
-    function toggleMenu(el) {
-        el.classList.toggle('active');
+    // كود العداد المباشر
+    function updateCounter() {
+        // استبدل 'nader_pro_2026' بأي اسم فريد خاص بك
+        const storageKey = 'nader_visitor_count';
+        let count = localStorage.getItem(storageKey) || 0;
+        count = parseInt(count) + 1;
+        localStorage.setItem(storageKey, count);
+        document.getElementById('count').innerText = count.toLocaleString();
     }
+    
+    // تشغيل العداد عند التحميل
+    updateCounter();
+
+    function toggleMenu(el) { el.classList.toggle('active'); }
 
     function updateAll() {
         const text = document.getElementById('userInput').value;
         if(!text) return;
 
-        // توليد قوائم مختلفة
-        render('gamingList', [
-            `〆${text}〆`, `々${text}々`, `๛${text}๛`, `亗${text}亗`, `『${text}』`, `( ${text} )`
-        ]);
-
-        render('royalList', [
-            `꧁ ${text} ꧂`, `♛ ${text} ♛`, `♔ ${text} ♔`, `★彡 ${text} 彡★`, `⚡ ${text} ⚡`, `💎 ${text} 💎`
-        ]);
-
-        render('rareList', [
-            `𓆩 ${text} 𓆪`, `𓐍 ${text} 𓐍`, `𓊈 ${text} 𓊉`, `⫷ ${text} ⫸`, `₪ ${text} ₪`, `۞ ${text} ۞`
-        ]);
+        render('gamingList', [`〆${text}〆`, `々${text}々`, `亗${text}亗`, `『${text}』`]);
+        render('royalList', [`꧁ ${text} ꧂`, `♛ ${text} ♛`, `♔ ${text} ♔`, `★彡 ${text} 彡★`]);
+        render('rareList', [`𓆩 ${text} 𓆪`, `𓊈 ${text} 𓊉`, `⫷ ${text} ⫸`, `₪ ${text} ₪`]);
     }
 
     function render(id, items) {
@@ -225,7 +204,7 @@
         items.forEach(item => {
             const div = document.createElement('div');
             div.className = 'result-item';
-            div.innerHTML = `<span>${item}</span> <small style="font-size: 0.6rem; opacity: 0.5;">لمس للنسخ</small>`;
+            div.innerHTML = `<span>${item}</span>`;
             div.onclick = (e) => { e.stopPropagation(); copy(item); };
             container.appendChild(div);
         });
